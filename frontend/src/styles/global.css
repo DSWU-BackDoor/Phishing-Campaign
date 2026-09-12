@@ -1,0 +1,61 @@
+﻿:root {
+  font-family:'Segoe UI','Malgun Gothic',sans-serif;
+  color:#222139;
+  background:#fffcf5;
+  font-synthesis:none;
+  text-rendering:optimizeLegibility;
+  -webkit-font-smoothing:antialiased;
+  font-size:14px
+}
+
+* {
+  box-sizing:border-box
+}
+
+body {
+  margin:0
+}
+
+button,input {
+  font:inherit
+}
+
+button {
+  cursor:pointer;
+  border:0
+}
+
+button:disabled {
+  cursor:default
+}
+
+button:focus-visible,input:focus-visible {
+  outline:3px solid #20b9cf;
+  outline-offset:3px
+}
+
+h1,h2,h3,p {
+  margin:0
+}
+
+input {
+  min-width:0
+}
+
+
+.muted {
+  color:#91a4c1;
+  font-size:12px;
+  line-height:1.7
+}
+
+.not-found {
+  padding:80px 24px;
+  text-align:center
+}
+
+.not-found p {
+  margin:16px 0
+}
+
+
