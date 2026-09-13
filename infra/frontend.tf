@@ -23,9 +23,30 @@ resource "aws_cloudfront_origin_access_control" "frontend" {
   signing_protocol                  = "sigv4"
 }
 
+# CloudFront용 WAF 
+resource "aws_wafv2_web_acl" "frontend" {
+  provider = aws.us_east_1
+
+  name  = "phishing-campaign-frontend-waf"
+  scope = "CLOUDFRONT"
+
+  default_action {
+    allow {}
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "phishing-campaign-frontend-waf"
+    sampled_requests_enabled   = true
+  }
+}
+
 resource "aws_cloudfront_distribution" "frontend" {
   enabled             = true
   default_root_object = "index.html"
+
+  # CloudFront에 WAF 연결
+  web_acl_id = aws_wafv2_web_acl.frontend.arn
 
   origin {
     domain_name              = aws_s3_bucket.frontend.bucket_regional_domain_name
