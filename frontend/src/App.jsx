@@ -3,7 +3,6 @@ import PhishingLandingPage from './pages/PhishingLandingPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
 import NotFoundPage from './pages/NotFoundPage'
 
-//test: trigger frontend deployment
 export default function App() {
   return (
     <Routes>
