@@ -1,6 +1,6 @@
 ﻿import { useEffect, useState } from 'react'
 import config from '../phishingConfig.json'
-import { getStats, emptyStats, apiMode } from '../lib/api'
+import { getStats, getFeedback, emptyStats, apiMode } from '../lib/api'
 import '../styles/AdminDashboardPage.css'
 
 const sources = [
@@ -13,6 +13,9 @@ const sources = [
 export default function AdminDashboardPage() {
   const [data, setData] = useState(emptyStats)
   const [error, setError] = useState('')
+  const [feedback, setFeedback] = useState([])
+  const [feedbackError, setFeedbackError] = useState('')
+  const [feedbackLoading, setFeedbackLoading] = useState(true)
   const [auto, setAuto] = useState(true)
   const [updated, setUpdated] = useState(() => new Date().toLocaleTimeString('ko-KR'))
 
@@ -32,8 +35,26 @@ export default function AdminDashboardPage() {
       }
     }
 
+    async function refreshFeedback() {
+      try {
+        const items = await getFeedback()
+        if (active) {
+          setFeedback(items)
+          setFeedbackError('')
+        }
+      } catch {
+        if (active) setFeedbackError('후기를 불러오지 못했습니다. 후기 API 연결 및 관리자 인증을 확인하세요.')
+      } finally {
+        if (active) setFeedbackLoading(false)
+      }
+    }
+
     void refresh()
-    const timer = auto ? setInterval(refresh, 5000) : null
+    void refreshFeedback()
+    const timer = auto ? setInterval(() => {
+      void refresh()
+      void refreshFeedback()
+    }, 5000) : null
     return () => {
       active = false
       clearInterval(timer)
@@ -120,9 +141,25 @@ export default function AdminDashboardPage() {
             </div>
           </section>
         </div>
+        <section className="feedback-panel" aria-labelledby="feedback-title">
+          <h2 id="feedback-title">참가자 후기</h2>
+          <p className="muted">불러온 후기 {feedback.length}건 · 최신순 · 선택 제출</p>
+          {feedbackError && <p className="error" role="alert">{feedbackError}</p>}
+          {feedbackLoading ? <p role="status">후기를 불러오는 중...</p> : (
+            <>
+              {!feedbackError && feedback.length === 0 && <p className="muted">아직 작성된 후기가 없어요.</p>}
+              <ul className="feedback-list" tabIndex={0} aria-label="참가자 후기 목록">
+                {feedback.map(item => (
+                  <li key={item.id}>
+                    <time dateTime={item.createdAt}>{new Date(item.createdAt).toLocaleString('ko-KR')}</time>
+                    <p>{item.content}</p>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+        </section>
       </div>
     </main>
   )
 }
-
-
