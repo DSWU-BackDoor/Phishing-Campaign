@@ -1,7 +1,8 @@
 ﻿import { useEffect, useRef, useState } from 'react'
 
 import config from '../phishingConfig.json'
-import { submitTrainingEmail } from '../lib/api'
+import { submitFeedback, submitTrainingEmail } from '../lib/api'
+import FeedbackForm from './FeedbackForm'
 
 import '../styles/EducationModal.css'
 
@@ -30,6 +31,9 @@ export default function EducationModal({
   const [emailError, setEmailError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [feedback, setFeedback] = useState('')
+  const [feedbackError, setFeedbackError] = useState('')
+  const saving = useRef(false)
 
   useEffect(() => {
     const dialog = ref.current
@@ -61,35 +65,40 @@ export default function EducationModal({
     }
   }
 
-  async function handleTrainingSignup(event) {
-    event.preventDefault()
-
+  async function handleConfirm() {
+    if (saving.current) return
     const trimmedEmail = email.trim()
-
-    if (!trimmedEmail) {
-      setEmailError('이메일을 입력해주세요.')
+    if (consent && !submitted && !isValidEmail(trimmedEmail)) {
+      setEmailError(trimmedEmail ? '올바른 이메일 형식이 아닙니다.' : '이메일을 입력해주세요.')
+      ref.current.querySelector('#training-email')?.focus()
       return
     }
 
-    if (!isValidEmail(trimmedEmail)) {
-      setEmailError('올바른 이메일 형식이 아닙니다.')
-      return
-    }
-
+    saving.current = true
+    setSubmitting(true)
+    setEmailError('')
+    setFeedbackError('')
     try {
-      setSubmitting(true)
-      setEmailError('')
-
-      await submitTrainingEmail(trimmedEmail)
-
-      setSubmitted(true)
-    } catch (error) {
-      console.error(error)
-
-      setEmailError(
-        '신청 중 오류가 발생했습니다. 다시 시도해주세요.'
-      )
+      if (consent && !submitted) {
+        try {
+          await submitTrainingEmail(trimmedEmail)
+          setSubmitted(true)
+        } catch {
+          setEmailError('신청 중 오류가 발생했습니다. 다시 시도해주세요.')
+          return
+        }
+      }
+      if (!reported && feedback.trim()) {
+        try {
+          await submitFeedback(feedback)
+        } catch {
+          setFeedbackError('후기를 저장하지 못했어요. 작성한 내용은 유지되니 다시 시도해주세요.')
+          return
+        }
+      }
+      close()
     } finally {
+      saving.current = false
       setSubmitting(false)
     }
   }
@@ -98,7 +107,10 @@ export default function EducationModal({
     <dialog
       className="education"
       ref={ref}
-      onCancel={close}
+      onCancel={event => {
+        if (saving.current) event.preventDefault()
+        else close()
+      }}
       aria-labelledby="education-title"
     >
       <div
@@ -110,6 +122,7 @@ export default function EducationModal({
         <button
           className="close"
           onClick={close}
+          disabled={submitting}
           aria-label="닫기"
         >
           ×
@@ -137,7 +150,7 @@ export default function EducationModal({
             </>
           )}
 
-          이 사이트는 피싱 예방 및 보안 교육을 목적으로 제작된 모의 사이트입니다.
+          이 사이트는 피싱 예방 및 보안 교육을 목적으로 BackDoor에서 제작한 모의 사이트입니다.
         </div>
 
         <p className="section-label">
@@ -171,7 +184,7 @@ export default function EducationModal({
           </h3>
 
           <p>
-            {config.boothDate} 현장 부스에서 아래 코드를 제시하면 굿즈를 드려요
+            {config.boothDate} 현장 부스에서 아래 코드를 제시하면 간식을 드려요.
           </p>
 
           <div className="ticket-code">
@@ -183,10 +196,20 @@ export default function EducationModal({
           </small>
         </section>
 
+        {!reported && (
+          <FeedbackForm
+            content={feedback}
+            onChange={value => { setFeedback(value); setFeedbackError('') }}
+            submitting={submitting}
+            error={feedbackError}
+          />
+        )}
+
         <label className="consent">
           <input
             type="checkbox"
             checked={consent}
+            disabled={submitting || submitted}
             onChange={handleConsent}
           />
 
@@ -203,11 +226,7 @@ export default function EducationModal({
         </label>
 
         {consent && (
-          <form
-            className="training-signup"
-            onSubmit={handleTrainingSignup}
-            noValidate
-          >
+          <section className="training-signup">
             <label htmlFor="training-email">
               2차 훈련 수신 이메일
             </label>
@@ -225,7 +244,7 @@ export default function EducationModal({
               }}
               placeholder="example@duksung.ac.kr"
               autoComplete="email"
-              disabled={submitted}
+              disabled={submitted || submitting}
               aria-invalid={Boolean(emailError)}
               aria-describedby={
                 emailError
@@ -244,29 +263,19 @@ export default function EducationModal({
               </p>
             )}
 
-            {submitted ? (
-              <p className="signup-success">
-                2차 모의 훈련 신청이 완료되었습니다.
-              </p>
-            ) : (
-              <button
-                type="submit"
-                className="training-submit"
-                disabled={submitting}
-              >
-                {submitting
-                  ? '신청 중...'
-                  : '2차 훈련 신청하기'}
-              </button>
+            {submitted && (
+              <p className="signup-success">2차 모의 훈련 신청이 완료되었습니다.</p>
             )}
-          </form>
+          </section>
         )}
 
         <button
           className="understood"
-          onClick={close}
+          onClick={handleConfirm}
+          disabled={submitting}
+          aria-busy={submitting}
         >
-          확인했어요
+          {submitting ? '저장 중...' : '훈련 마치기'}
         </button>
       </div>
     </dialog>

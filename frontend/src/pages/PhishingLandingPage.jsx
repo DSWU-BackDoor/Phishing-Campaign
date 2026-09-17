@@ -54,6 +54,7 @@ export default function PhishingLandingPage() {
     }
     event.currentTarget.reset()
     void recordEvent('FORM_SUBMIT')
+    setReported(false)
     setOpen(true)
   }
 
@@ -120,4 +121,3 @@ export default function PhishingLandingPage() {
     </main>
   )
 }
-
