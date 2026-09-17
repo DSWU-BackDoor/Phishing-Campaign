@@ -9,7 +9,8 @@ terraform {
 }
 
 provider "aws" {
-  region = "ap-northeast-2"
+  region = "ap-southeast-2"
+  profile = "dain_Dev"
 }
 
 # 1. State 보관용 S3 버킷
