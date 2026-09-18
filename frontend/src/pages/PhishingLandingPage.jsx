@@ -1,5 +1,4 @@
 ﻿import { useEffect, useRef, useState } from 'react'
-import config from '../phishingConfig.json'
 import {  recordEvent } from '../lib/api'
 import EducationModal from '../components/EducationModal'
 import { validateField } from '../lib/validation'
@@ -70,7 +69,6 @@ export default function PhishingLandingPage() {
     <main className="landing">
       <header>
         <span className="badge">✣ 마감임박</span>
-        <p className="school">{config.school}</p>
         <h1>시험 기간엔 역시<br />당충전이 필요하니까</h1>
         <p className="subtitle">선착순 300명 · 재학생 간식 쿠폰 증정</p>
       </header>
