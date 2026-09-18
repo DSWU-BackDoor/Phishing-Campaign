@@ -2,10 +2,18 @@
 
 AWS 인프라를 Terraform으로 구성합니다.
 
-프론트엔드와 백엔드 인프라는 `infra/`에서 통합 관리하며,
-Terraform State는 S3 Remote Backend를 통해 공유합니다.
+Terraform State는 S3 Remote Backend(`backdoor-tfstate-2026`)를 통해 공유합니다.
 
-## 파일 구성
+- `infra/*.tf` (이 디렉터리): 프론트엔드 호스팅(S3/CloudFront/WAF) 인프라. State key `terraform.tfstate`.
+- `infra/modules/`, `infra/environments/`: 백엔드 API(Lambda/API Gateway/DynamoDB 등) 인프라.
+  환경별로 별도 state를 사용합니다 (`backend/dev/terraform.tfstate`, `backend/prod/terraform.tfstate`).
+  자세한 내용은 [modules/](modules)와 [environments/dev](environments/dev)를 참고하세요.
+
+두 인프라는 서로 다른 state로 분리되어 있어 독립적으로 배포/변경할 수 있습니다.
+백엔드 environments는 프론트엔드 CloudFront 도메인을 `var.frontend_domain`으로 입력받아 CORS 설정에만 사용하며,
+프론트엔드 리소스를 직접 관리하지 않습니다.
+
+## 파일 구성 (프론트엔드 호스팅)
 
 | 파일 | 설명 |
 | --- | --- |

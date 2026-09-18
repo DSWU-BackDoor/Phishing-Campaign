@@ -6,3 +6,10 @@
 crash.log
 *.tfvars
 *.tfvars.json
+
+# environments/*/terraform.tfvars는 민감정보(admin_secret_key 등)를 담지 않는
+# 환경별 기본값 파일이므로 예외적으로 추적한다. 시크릿은 TF_VAR_* 환경변수로만 주입할 것.
+!environments/*/terraform.tfvars
+
+# Lambda 빌드 산출물을 zip으로 묶은 캐시
+modules/api/.build/
