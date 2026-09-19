@@ -1,0 +1,22 @@
+{
+  "name": "phishing-campaign-lambdas",
+  "version": "1.0.0",
+  "private": true,
+  "description": "교내 모의 피싱 훈련 캠페인 백엔드 Lambda 함수 모음",
+  "type": "commonjs",
+  "scripts": {
+    "build": "node build.mjs",
+    "typecheck": "tsc --noEmit",
+    "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\""
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.700.0",
+    "@aws-sdk/lib-dynamodb": "^3.700.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.147",
+    "@types/node": "^20.14.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.6.0"
+  }
+}
