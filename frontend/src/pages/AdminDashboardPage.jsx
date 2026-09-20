@@ -1,5 +1,6 @@
 ﻿import { useEffect, useState } from 'react'
 import config from '../phishingConfig.json'
+import AdminAuthForm from '../components/AdminAuthForm'
 import { getStats, getFeedback, emptyStats, apiMode } from '../lib/api'
 import '../styles/AdminDashboardPage.css'
 
@@ -11,6 +12,10 @@ const sources = [
 ]
 
 export default function AdminDashboardPage() {
+  const [adminKey, setAdminKey] = useState('')
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [authError, setAuthError] = useState('')
+  const [authenticating, setAuthenticating] = useState(false)
   const [data, setData] = useState(emptyStats)
   const [error, setError] = useState('')
   const [feedback, setFeedback] = useState([])
@@ -20,11 +25,12 @@ export default function AdminDashboardPage() {
   const [updated, setUpdated] = useState(() => new Date().toLocaleTimeString('ko-KR'))
 
   useEffect(() => {
+    if (!isAuthenticated) return
     let active = true
 
     async function refresh() {
       try {
-        const next = await getStats()
+        const next = await getStats(adminKey)
         if (active) {
           setData(next)
           setUpdated(new Date().toLocaleTimeString('ko-KR'))
@@ -37,7 +43,7 @@ export default function AdminDashboardPage() {
 
     async function refreshFeedback() {
       try {
-        const items = await getFeedback()
+        const items = await getFeedback(adminKey)
         if (active) {
           setFeedback(items)
           setFeedbackError('')
@@ -49,7 +55,6 @@ export default function AdminDashboardPage() {
       }
     }
 
-    void refresh()
     void refreshFeedback()
     const timer = auto ? setInterval(() => {
       void refresh()
@@ -59,7 +64,44 @@ export default function AdminDashboardPage() {
       active = false
       clearInterval(timer)
     }
-  }, [auto])
+  }, [auto, isAuthenticated, adminKey])
+
+  async function handleAuth(event) {
+    event.preventDefault()
+    if (authenticating || !adminKey.trim()) return
+    setAuthenticating(true)
+    setAuthError('')
+    try {
+      if (!apiMode) {
+        setAuthError('관리자 인증을 위한 API 주소가 설정되지 않았습니다.')
+        return
+      }
+      const next = await getStats(adminKey)
+      setData(next)
+      setUpdated(new Date().toLocaleTimeString('ko-KR'))
+      setIsAuthenticated(true)
+    } catch (error) {
+      setAuthError(error.status === 401
+        ? '관리자 키가 올바르지 않습니다.'
+        : '인증 요청에 실패했습니다. API 연결을 확인하고 다시 시도해주세요.')
+    } finally {
+      setAuthenticating(false)
+    }
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <main className="dashboard">
+        <AdminAuthForm
+          adminKey={adminKey}
+          onChange={value => { setAdminKey(value); setAuthError('') }}
+          onSubmit={handleAuth}
+          error={authError}
+          submitting={authenticating}
+        />
+      </main>
+    )
+  }
 
   const total = data.visits
   const percent = total ? data.submits / total * 100 : 0
