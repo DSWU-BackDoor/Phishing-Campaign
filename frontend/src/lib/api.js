@@ -118,7 +118,7 @@ export async function submitFeedback(value) {
 }
 
 
-export async function getFeedback() {
+export async function getFeedback(adminKey) {
   // LOCAL MOCK
   if (!apiMode) {
     try {
@@ -134,7 +134,8 @@ export async function getFeedback() {
   const response = await fetch(
     `${API_BASE_URL}/feedback`,
     {
-      credentials: 'include',
+      // 인증 화면에서 입력한 관리자 키를 전달해 서버에서 후기 조회 권한을 확인합니다.
+      headers: { 'x-admin-key': adminKey },
     },
   )
 
@@ -351,7 +352,7 @@ export async function submitTrainingEmail(email) {
 
 // Stats
 
-export async function getStats() {
+export async function getStats(adminKey) {
   // LOCAL MOCK
   if (!apiMode) {
     return readLocalStats()
@@ -361,12 +362,16 @@ export async function getStats() {
   const response = await fetch(
     `${API_BASE_URL}/stats`,
     {
-      credentials: 'include',
+      // React state에 보관한 입력 키로 인증하며, 인증 후 5초 갱신에도 같은 키를 전달합니다.
+      // 쿠키 인증용 credentials: 'include'는 사용하지 않습니다.
+      headers: { 'x-admin-key': adminKey },
     },
   )
 
-  if (!response.ok) {
-    throw new Error(`통계 조회 실패: ${response.status}`)
+  if (response.status !== 200) {
+    const error = new Error(`통계 조회 실패: ${response.status}`)
+    error.status = response.status
+    throw error
   }
 
   return response.json()
