@@ -269,6 +269,12 @@ export default function EducationModal({
           </section>
         )}
 
+        <p className="training-sharing-note">
+          ※ 다른 참여자를 위해
+          <br />
+          모의 훈련에 대한 정보 공유는 자제해 주세요.
+        </p>
+
         <button
           className="understood"
           onClick={handleConfirm}
