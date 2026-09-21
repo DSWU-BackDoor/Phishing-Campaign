@@ -37,6 +37,24 @@
   cursor:pointer;
 }
 .admin-auth button:disabled { opacity:.55; cursor:default; }
+.admin-key-field { position:relative; }
+.admin-key-field input { padding-right:52px; }
+.admin-auth .admin-key-toggle {
+  position:absolute;
+  top:50%;
+  right:8px;
+  transform:translateY(-50%);
+  display:grid;
+  place-items:center;
+  width:40px;
+  height:40px;
+  margin:0;
+  padding:8px;
+  border-radius:6px;
+  background:transparent;
+  color:#91a4c1;
+}
+.admin-auth .admin-key-toggle:hover:not(:disabled) { color:#e6edf9; }
 .admin-auth input:focus-visible,.admin-auth button:focus-visible {
   outline:2px solid #25c8ce;
   outline-offset:3px;
