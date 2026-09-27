@@ -10,6 +10,7 @@ const EMPTY_STATS: StatsSummary = {
   submits: 0,
   reports: 0,
   trainingEmailCount: 0,
+  trainingPageViews: 0,
   sources: Object.fromEntries(SOURCES.map((source) => [source, 0])) as StatsSummary['sources'],
 }
 
@@ -35,6 +36,7 @@ export async function handler(
       submits: item.submits ?? 0,
       reports: item.reports ?? 0,
       trainingEmailCount: item.trainingEmailCount ?? 0,
+      trainingPageViews: item.trainingPageViews ?? 0,
       sources: {
         ...EMPTY_STATS.sources,
         ...(item.sources ?? {}),

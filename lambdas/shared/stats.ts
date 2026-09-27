@@ -69,6 +69,7 @@ export async function ensureSummaryInitialized(): Promise<void> {
           submits: 0,
           reports: 0,
           trainingEmailCount: 0,
+          trainingPageViews: 0,
           sources: zeroSources,
         },
         ConditionExpression: 'attribute_not_exists(PK)',
@@ -88,6 +89,7 @@ interface SummaryIncrements {
   submits?: number
   reports?: number
   trainingEmailCount?: number
+  trainingPageViews?: number
   source?: Source
 }
 
@@ -102,7 +104,7 @@ export async function incrementSummary(
   const values: Record<string, number> = {}
   const names: Record<string, string> = {}
 
-  for (const key of ['visits', 'submits', 'reports', 'trainingEmailCount'] as const) {
+  for (const key of ['visits', 'submits', 'reports', 'trainingEmailCount', 'trainingPageViews'] as const) {
     const amount = increments[key]
 
     if (amount === undefined) continue
