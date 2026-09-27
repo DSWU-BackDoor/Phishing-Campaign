@@ -1,4 +1,4 @@
-export const EVENT_TYPES = ['PAGE_VIEW', 'FORM_SUBMIT', 'REPORT'] as const
+export const EVENT_TYPES = ['PAGE_VIEW', 'FORM_SUBMIT', 'REPORT', 'TRAINING_PAGE_VIEW'] as const
 export type EventType = (typeof EVENT_TYPES)[number]
 
 export const SOURCES = ['everytime', 'qr', 'instagram', 'direct'] as const
@@ -17,5 +17,6 @@ export interface StatsSummary {
   submits: number
   reports: number
   trainingEmailCount: number
+  trainingPageViews: number
   sources: Record<Source, number>
 }

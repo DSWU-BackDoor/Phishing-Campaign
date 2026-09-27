@@ -115,6 +115,7 @@ export default function AdminDashboardPage() {
     ['피싱 낚임 (제출)', data.submits, '♧'],
     ['피싱 신고', data.reports, '⚑'],
     ['2차 훈련 동의', data.trainingEmailCount, '✉'],
+    ['2차 훈련 열람', data.trainingPageViews, '👁'],
   ]
 
   return (

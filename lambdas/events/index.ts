@@ -2,7 +2,7 @@ import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda
 import { parseJsonBody } from '../shared/http'
 import { badRequest, ok, serverError } from '../shared/response'
 import { ensureSummaryInitialized, incrementSummary, tryClaimSessionEvent } from '../shared/stats'
-import { isEventType, isSource } from '../shared/types'
+import { isEventType, isSource, type Source } from '../shared/types'
 
 interface EventsRequestBody {
   sessionId?: string
@@ -27,7 +27,9 @@ export async function handler(
     return badRequest('eventType이 올바르지 않습니다.')
   }
 
-  if (!isSource(source)) {
+  // source(유입 경로)는 최초 방문(PAGE_VIEW) 집계에만 의미가 있다.
+  // 그 외 이벤트는 값이 와도 무시한다.
+  if (eventType === 'PAGE_VIEW' && !isSource(source)) {
     return badRequest('source가 올바르지 않습니다.')
   }
 
@@ -40,7 +42,8 @@ export async function handler(
 
       switch (eventType) {
         case 'PAGE_VIEW':
-          await incrementSummary({ visits: 1, source })
+          // source는 위에서 이미 검증됨(PAGE_VIEW일 때만 강제).
+          await incrementSummary({ visits: 1, source: source as Source })
           break
 
         case 'FORM_SUBMIT':
@@ -49,6 +52,10 @@ export async function handler(
 
         case 'REPORT':
           await incrementSummary({ reports: 1 })
+          break
+
+        case 'TRAINING_PAGE_VIEW':
+          await incrementSummary({ trainingPageViews: 1 })
           break
       }
     }

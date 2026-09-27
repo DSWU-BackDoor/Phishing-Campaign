@@ -8,6 +8,7 @@ export const emptyStats = {
   submits: 0,
   reports: 0,
   trainingEmailCount: 0,
+  trainingPageViews: 0,
   sources: {
     everytime: 0,
     qr: 0,
@@ -244,6 +245,10 @@ function recordLocal(eventType) {
 
     case 'REPORT':
       stats.reports += 1
+      break
+
+    case 'TRAINING_PAGE_VIEW':
+      stats.trainingPageViews += 1
       break
 
     default:
