@@ -214,8 +214,9 @@ export default function EducationModal({
         {consent && (
           <section className="training-signup">
             <label htmlFor="training-email">
-              2차 훈련 수신 이메일(*메일이 오지 않았을 경우, 스팸함을
-              확인해주세요!)
+              2차 훈련 수신 이메일
+              <br />
+              (*메일이 오지 않았을 경우, 스팸함을 확인해주세요!)
             </label>
 
             <input
