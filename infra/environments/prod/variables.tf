@@ -35,3 +35,26 @@ variable "alarm_email" {
   description = "Lambda 에러/예산 초과 알림을 받을 이메일 주소 목록"
   type        = list(string)
 }
+
+# ── 2차 훈련 이메일 발송 ──
+
+variable "resend_api_key" {
+  description = "Resend 이메일 발송 API 키. TF_VAR_resend_api_key 환경변수로 주입할 것."
+  type        = string
+  sensitive   = true
+}
+
+variable "sender_email" {
+  description = "훈련 이메일 발신자 주소 (예: 'Security Alert <security@example.com>')"
+  type        = string
+}
+
+variable "email_subject" {
+  description = "훈련 이메일 제목"
+  type        = string
+}
+
+variable "landing_base_url" {
+  description = "훈련 결과 랜딩 페이지 base URL (예: https://d10h8rd9w1ws66.cloudfront.net)"
+  type        = string
+}

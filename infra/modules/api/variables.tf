@@ -40,3 +40,26 @@ variable "campaign_id" {
   description = "현재 캠페인 식별자 (예: 2026-MIDTERM-SNACK-EVENT)"
   type        = string
 }
+
+# ── 2차 훈련 이메일 발송 관련 변수 ──
+
+variable "resend_api_key" {
+  description = "Resend 이메일 발송 API 키"
+  type        = string
+  sensitive   = true
+}
+
+variable "sender_email" {
+  description = "훈련 이메일 발신자 주소 (예: 'Security Alert <security@example.com>')"
+  type        = string
+}
+
+variable "email_subject" {
+  description = "훈련 이메일 제목"
+  type        = string
+}
+
+variable "landing_base_url" {
+  description = "훈련 결과 랜딩 페이지 base URL (예: https://d10h8rd9w1ws66.cloudfront.net)"
+  type        = string
+}

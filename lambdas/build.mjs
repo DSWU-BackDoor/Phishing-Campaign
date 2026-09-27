@@ -4,6 +4,7 @@ import { rmSync } from 'node:fs'
 const entries = [
   'events',
   'training-email',
+  'send-training-email',
   'feedback-post',
   'feedback-get',
   'stats-get',

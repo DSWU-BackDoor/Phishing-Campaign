@@ -2,7 +2,7 @@ import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda
 import { parseJsonBody } from '../shared/http'
 import { badRequest, ok, serverError } from '../shared/response'
 import { ensureSummaryInitialized, incrementSummary, tryClaimSessionEvent } from '../shared/stats'
-import { isEventType, isSource } from '../shared/types'
+import { isEventType, isSource, SOURCE_REQUIRED_EVENTS } from '../shared/types'
 
 interface EventsRequestBody {
   sessionId?: string
@@ -27,7 +27,8 @@ export async function handler(
     return badRequest('eventType이 올바르지 않습니다.')
   }
 
-  if (!isSource(source)) {
+  // source는 PAGE_VIEW 전용 필드다. EMAIL_CLICK 등 다른 이벤트는 source 없이도 허용한다.
+  if (SOURCE_REQUIRED_EVENTS.includes(eventType) && !isSource(source)) {
     return badRequest('source가 올바르지 않습니다.')
   }
 
@@ -49,6 +50,10 @@ export async function handler(
 
         case 'REPORT':
           await incrementSummary({ reports: 1 })
+          break
+
+        case 'EMAIL_CLICK':
+          await incrementSummary({ emailClicks: 1 })
           break
       }
     }

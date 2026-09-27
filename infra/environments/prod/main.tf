@@ -38,6 +38,12 @@ module "api" {
 
   admin_secret_key = var.admin_secret_key
   campaign_id      = var.campaign_id
+
+  # 2차 훈련 이메일 발송
+  resend_api_key   = var.resend_api_key
+  sender_email     = var.sender_email
+  email_subject    = var.email_subject
+  landing_base_url = var.landing_base_url
 }
 
 module "observability" {
